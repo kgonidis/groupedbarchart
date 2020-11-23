@@ -24,12 +24,20 @@ Array.prototype.Unique = function() {
 export const GroupedBarPanel: React.FC<Props> = ({ options, data, width, height }) => {
   const theme = useTheme();
   const styles = getStyles();
-  let traces: Data[] = [];
+  const trace: Data = {
+    type: 'bar',
+    x: [],
+    y: [],
+    marker: {
+      color: [],
+    },
+    text: [],
+  };
   if (data.state === LoadingState.Done && data.series.length >= 1 && data.series[0].fields.length >= 3) {
     const fields = data.series[0].fields;
-    const metrics = fields[0].values.toArray();
-    const X = fields[1].values.toArray();
-    const Y = fields[2].values.toArray();
+    trace.text = fields[0].values.toArray();
+    trace.x = fields[1].values.toArray();
+    trace.y = fields[2].values.toArray();
     const colors = [
       options.fieldColor1,
       options.fieldColor2,
@@ -40,38 +48,20 @@ export const GroupedBarPanel: React.FC<Props> = ({ options, data, width, height 
       options.fieldColor7,
       options.fieldColor8,
     ];
-    const d = [];
-    for (let i = 0; i < X.length; i++) {
-      d.push({
-        series: metrics[i],
-        x: X[i],
-        y: Y[i],
-      });
-    }
 
-    let uniqueMetrics = metrics.Unique();
-    let uniqueX = X.Unique();
-    for (let i = 0; i < uniqueMetrics.length; i++) {
-      let m = uniqueMetrics[i];
-      let y = [];
-      let xx = [];
-      for (const x of uniqueX) {
-        const v = d.find(v => v.series === m && v.x === x);
-        if (v === undefined) {
-          //y.push(0);
-        } else {
-          xx.push(v.x);
-          y.push(v.y);
+    if (trace.text.length) {
+      let next_metric = '';
+      let color_index = 0;
+      for (let i = 0; i < trace.text.length; i++) {
+        const metric = trace.text[i];
+
+        if (metric != next_metric) {
+          color_index++;
+          next_metric = metric;
         }
-      }
 
-      traces.push({
-        x: xx,
-        y: y,
-        name: m,
-        marker: { color: i < 8 ? colors[i] : undefined },
-        type: 'bar',
-      });
+        trace.marker.color.push(colors[color_index]);
+      }
     }
   }
   return (
@@ -85,7 +75,7 @@ export const GroupedBarPanel: React.FC<Props> = ({ options, data, width, height 
       )}
     >
       <Plot
-        data={traces}
+        data={[trace]}
         layout={{
           barmode: options.barType,
           width: width,
