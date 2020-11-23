@@ -49,20 +49,24 @@ export const GroupedBarPanel: React.FC<Props> = ({ options, data, width, height 
       options.fieldColor8,
     ];
 
+    const _colors: string[] = [];
+
     if (trace.text.length) {
       let next_metric = '';
       let color_index = 0;
       for (let i = 0; i < trace.text.length; i++) {
         const metric = trace.text[i];
 
-        if (metric != next_metric) {
+        if (metric !== next_metric) {
           color_index++;
           next_metric = metric;
         }
 
-        trace.marker.color.push(colors[color_index]);
+        _colors.push(colors[color_index]);
       }
     }
+
+    trace.marker = { colors: _colors };
   }
   return (
     <div
