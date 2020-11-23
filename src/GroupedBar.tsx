@@ -96,6 +96,7 @@ export const GroupedBarPanel: React.FC<Props> = ({ options, data, width, height 
             linecolor: theme.colors.text,
             tickcolor: theme.colors.text,
             tickfont: { color: theme.colors.text },
+            type: "category"
           },
           yaxis: {
             linecolor: theme.colors.text,
